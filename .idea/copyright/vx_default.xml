@@ -1,9 +1,0 @@
-<component name="CopyrightManager">
-  <copyright>
-    <option name="notice" value="Copyright (C) &amp;#36;today.format(&quot;dd&quot;)/&amp;#36;today.format(&quot;MM&quot;)/&amp;#36;today.year Varimetrix GmbH &lt;sales@vxapps.com&gt;&#10;&#10;The ownership of this document rests with the Varimetrix GmbH. It is&#10;strictly prohibited to change, sell or publish it in any way. In case&#10;you have access to this document, you are obligated to ensure its&#10;nondisclosure. Noncompliances will be prosecuted.&#10;&#10;Diese Datei ist Eigentum der Varimetrix GmbH. Ändern, verkaufen oder&#10;auf eine andere Weise verbreiten und öffentlich machen ist strikt&#10;untersagt. Falls Sie Zugang zu dieser Datei haben, sind Sie&#10;verpflichtet alles Mögliche für deren Geheimhaltung zu tun.&#10;Zuwiderhandlungen werden strafrechtlich verfolgt." />
-    <option name="keyword" value="Copyright" />
-    <option name="allowReplaceKeyword" value="" />
-    <option name="myName" value="vx.default" />
-    <option name="myLocal" value="true" />
-  </copyright>
-</component>
