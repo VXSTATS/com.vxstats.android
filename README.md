@@ -24,7 +24,9 @@ All values are defined over AndroidManifest.xml and used from there.
 ## Setup
 Setup your environment with your credentials. Please insert your username, password and url here. For defuscation please follow our best practice documentation.
 ```java
-Statistics.instance(this).setServerFilePath("https://$username:$password@$url/");
+Statistics.instance(this).setUsername("sandbox");
+Statistics.instance(this).setPassword("sandbox");
+Statistics.instance(this).setServerFilePath("https://sandbox.vxapps.com/");
 ```
 
 ## Page

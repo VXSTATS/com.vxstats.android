@@ -1,15 +1,15 @@
 /*
- * Copyright (C) 01/10/2020 VX APPS <sales@vxapps.com>
+ * Copyright (C) 10/01/2020 VX APPS <sales@vxapps.com>
  *
- * The ownership of this document rests with the VX APPS. It is
- * strictly prohibited to change, sell or publish it in any way. In case
- * you have access to this document, you are obligated to ensure its
- * nondisclosure. Noncompliances will be prosecuted.
+ * This document is property of VX APPS. It is strictly prohibited
+ * to modify, sell or publish it in any way. In case you have access
+ * to this document, you are obligated to ensure its nondisclosure.
+ * Noncompliances will be prosecuted.
  *
- * Diese Datei ist Eigentum der VX APPS. Ändern, verkaufen oder
- * auf eine andere Weise verbreiten und öffentlich machen ist strikt
- * untersagt. Falls Sie Zugang zu dieser Datei haben, sind Sie
- * verpflichtet alles Mögliche für deren Geheimhaltung zu tun.
+ * Diese Datei ist Eigentum der VX APPS. Jegliche Änderung, Verkauf
+ * oder andere Verbreitung und Veröffentlichung ist strikt untersagt.
+ * Falls Sie Zugang zu dieser Datei haben, sind Sie verpflichtet,
+ * alles in Ihrer Macht stehende für deren Geheimhaltung zu tun.
  * Zuwiderhandlungen werden strafrechtlich verfolgt.
  */
 
@@ -106,7 +106,7 @@ import android.view.accessibility.AccessibilityManager;
  * @~english @b Example: @~german @b Beispiel:
  * @~english @n 1. Define a path to the statistics server. @~german @n 1. Angeben eines Pfads zum Statistikserver.
  * @~
- * @code Statistics.instance(this).setServerFilePath("https://user:password@www.vxapps.com/u/stats.php");
+ * @code Statistics.instance(this).setServerFilePath("https://sandbox.vxapps.com");
  * @endcode
  * @~english 2. Transfer page impression. @~german 2. Seitenimpression übermitteln.
  * @~
@@ -228,8 +228,11 @@ public class Statistics {
       URL url = null;
 
       try {
+
         url = new URL( serverFilePath );
-      } catch ( MalformedURLException e ) {
+      }
+      catch ( MalformedURLException e ) {
+
         e.printStackTrace();
       }
 
@@ -244,6 +247,16 @@ public class Statistics {
       serverFilePath = proto + "://" + host + path;
     }
     m_serverFilePath = serverFilePath;
+  }
+
+  public void setUsername( String username ) {
+
+    m_user = username;
+  }
+
+  public void setPassword( String password ) {
+
+    m_pw = password;
   }
 
   /**
@@ -703,6 +716,7 @@ public class Statistics {
 
       try {
 
+        /* TODO: Insert digest auth: https://stackoverflow.com/a/40079688 */
         HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.STRICT_HOSTNAME_VERIFIER;
         SSLContext sc = SSLContext.getInstance( "TLS" );
         sc.init( null, new TrustManager[]{ new SSLTrustManager() }, new SecureRandom() );
@@ -724,7 +738,6 @@ public class Statistics {
         stream = con.getInputStream();
 
         wr.close();
-
       }
       catch ( NoSuchAlgorithmException e ) {
 
