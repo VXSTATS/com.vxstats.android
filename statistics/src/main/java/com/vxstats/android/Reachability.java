@@ -25,8 +25,6 @@ import android.telephony.TelephonyManager;
 
 public class Reachability {
 
-  private Context context;
-
   private NetworkInfo network;
 
   public String availableNetwork;
@@ -34,10 +32,13 @@ public class Reachability {
 
   public Reachability( Activity activity ) {
 
-    context = activity.getApplicationContext();
+    Context context = activity.getApplicationContext();
 
-    ConnectivityManager cm = ( ConnectivityManager ) context.getSystemService( context.CONNECTIVITY_SERVICE );
-    network = cm.getActiveNetworkInfo();
+    ConnectivityManager cm = ( ConnectivityManager ) context.getSystemService( Context.CONNECTIVITY_SERVICE );
+    if ( cm != null ) {
+
+      network = cm.getActiveNetworkInfo();
+    }
   }
 
   public String getConnectionType() {
@@ -116,6 +117,9 @@ public class Reachability {
           break;
         case TelephonyManager.NETWORK_TYPE_LTE:
           availableRadio = "LTE";
+          break;
+        case TelephonyManager.NETWORK_TYPE_NR:
+          availableRadio = "5G";
           break;
         case TelephonyManager.NETWORK_TYPE_UMTS:
           availableRadio = "3G";

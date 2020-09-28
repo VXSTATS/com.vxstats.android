@@ -23,6 +23,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -127,13 +128,13 @@ public class Statistics {
 
   private Activity m_activity;
 
-  private Context m_ctx;
+  private final Context m_ctx;
 
   /**
    * @~english Checking connection in order to determine the connection speed or to transfer pending data.
    * @~german Überprüfen der Verbindung um die Verbindungsgeschwindigkeit zu ermitteln oder ausstehende Daten zu übermitteln.
    */
-  private Reachability m_reach;
+  private final Reachability m_reach;
 
   /**
    * @~english Path to statistics server.
@@ -161,7 +162,7 @@ public class Statistics {
    */
   private String m_status = "Offline";
 
-  private List<String> m_messageQueue = new ArrayList<String>();
+  private final List<String> m_messageQueue = new ArrayList<>();
 
   private InitTask m_initTask;
 
@@ -224,7 +225,7 @@ public class Statistics {
 
     if ( serverFilePath.contains( "@" ) ) {
 
-      String[] login = new String[ 2 ];
+      String[] login;
       URL url = null;
 
       try {
@@ -279,9 +280,9 @@ public class Statistics {
       pageName = pageName.substring( 0, 255 );
     }
 
-    pageName.replace( "&", "%26" );
-    pageName.replace( "'", "%2F" );
-    pageName.replace( "|", "%7C" );
+    pageName = pageName.replace( "&", "%26" );
+    pageName = pageName.replace( "'", "%2F" );
+    pageName = pageName.replace( "|", "%7C" );
 
     m_lastPageName = pageName;
 
@@ -365,28 +366,34 @@ public class Statistics {
 
     if ( ! eventName.equals( "" ) ) {
 
-      eventName.replace( "&", "%26" );
-      eventName.replace( "'", "%2F" );
-      eventName.replace( "|", "%7C" );
+      eventName = eventName.replace( "&", "%26" );
+      eventName = eventName.replace( "'", "%2F" );
+      eventName = eventName.replace( "|", "%7C" );
       m_event = eventName;
-    } else
+    }
+    else {
+
       m_event = "";
+    }
 
     if ( ! value.equals( "" ) ) {
 
-      value.replace( "&", "%26" );
-      value.replace( "'", "%2F" );
-      value.replace( "|", "%7C" );
+      value = value.replace( "&", "%26" );
+      value = value.replace( "'", "%2F" );
+      value = value.replace( "|", "%7C" );
       m_value = value;
-    } else
+    }
+    else {
+
       m_value = "";
+    }
 
     String core = coreMessage();
     //addOutstandingMessage(core);
     m_initTask = new InitTask();
     m_initTask.execute( core );
 
-    if ( m_status != m_reach.getConnectionType() )
+    if ( !m_status.equals( m_reach.getConnectionType() ) )
       reachabilityChanged();
   }
 
@@ -428,7 +435,7 @@ public class Statistics {
 
     if ( latitude == 0.0 || longitude == 0.0 )
       Log.i( "STATISTICS", "Bad implementation - 'move' with empty 'latitude' or 'longitude'" );
-    event( "move", Float.toString( latitude ) + "," + Float.toString( longitude ) );
+    event( "move", latitude + "," + longitude );
   }
 
   /**
@@ -535,7 +542,7 @@ public class Statistics {
 
   private String coreMessage() {
 
-    String core = new String();
+    String core;
 
     /* device */
     core = "uuid=" + Device.instance( m_activity ).getUniqueIdentifier() + "&";
@@ -576,28 +583,32 @@ public class Statistics {
     }
 
     AccessibilityManager am = ( AccessibilityManager )m_ctx.getSystemService( Context.ACCESSIBILITY_SERVICE );
-    if ( am.isTouchExplorationEnabled() ) {
+    if ( am != null && am.isTouchExplorationEnabled() ) {
 
       core += "voiceover=1&";
     }
 
     WindowManager wm = ( WindowManager )m_ctx.getSystemService( Context.WINDOW_SERVICE );
-    Display display = wm.getDefaultDisplay();
-    Point size = new Point();
-    display.getSize(size);
-    core += "width=" + size.x + "&";
-    core += "height=" + size.y + "&";
+    if ( wm != null ) {
 
-    DisplayMetrics metrics = new DisplayMetrics();
-    display.getMetrics(metrics);
+      Display display = wm.getDefaultDisplay();
+      if ( display != null ) {
 
-    core += "dpr=" + metrics.density + "&";
+        Point size = new Point();
+        display.getSize( size );
+        core += "width=" + size.x + "&";
+        core += "height=" + size.y + "&";
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        display.getMetrics(metrics);
+        core += "dpr=" + metrics.density + "&";
+      }
+    }
 
     core += "created=" + System.currentTimeMillis() / 1000L + "&";
 
     /* data block */
     core += "page=" + m_lastPageName;
-
     if ( !m_event.equals( "" ) ) {
 
       core += "&action=" + m_event;
@@ -612,7 +623,7 @@ public class Statistics {
   private void reachabilityChanged() {
 
     m_status = m_reach.getConnectionType();
-    if ( m_status != "Offline" )
+    if ( !m_status.equals( "Offline" ) )
       sendOutstandingMessage();
   }
 
@@ -627,7 +638,7 @@ public class Statistics {
     String mes = preferences.getString( "offline", "" );
 
     String[] splitArray = mes.split( "\\|" );
-    List<String> temp_messageQueue = new ArrayList<String>();
+    List<String> temp_messageQueue = new ArrayList<>();
     if ( ! splitArray[ 0 ].equals( "" ) )
       temp_messageQueue.addAll( Arrays.asList( splitArray ) );
 
@@ -678,7 +689,7 @@ public class Statistics {
     }
   }*/
 
-  private class SSLTrustManager implements X509TrustManager {
+  private static class SSLTrustManager implements X509TrustManager {
 
     public void checkClientTrusted( X509Certificate[] chain, String authType ) {
 
@@ -708,7 +719,7 @@ public class Statistics {
     if ( ! m_user.equals( "" ) || ! m_pw.equals( "" ) ) {
 
       String serverAuth = m_user + ":" + m_pw;
-      serverAuthBase64 = Base64.encodeToString( serverAuth.getBytes( "UTF-8" ), Base64.DEFAULT );
+      serverAuthBase64 = Base64.encodeToString( serverAuth.getBytes( StandardCharsets.UTF_8 ), Base64.DEFAULT );
     }
 
     InputStream stream = null;
@@ -779,8 +790,7 @@ public class Statistics {
         }
         else {
 
-          List<String> temp_messageQueue = new ArrayList<String>();
-          temp_messageQueue.addAll( Arrays.asList( splitArray ) );
+          List<String> temp_messageQueue = new ArrayList<>( Arrays.asList( splitArray ) );
 
           for ( int i = 0; i < temp_messageQueue.size(); i++ )
             sendMessage( temp_messageQueue.get( i ) );
@@ -816,7 +826,7 @@ public class Statistics {
 
     private void sendMessage( String message ) {
 
-      if ( m_reach.getConnectionType() != "Offline" ) {
+      if ( !m_reach.getConnectionType().equals( "Offline" ) ) {
 
         try {
 

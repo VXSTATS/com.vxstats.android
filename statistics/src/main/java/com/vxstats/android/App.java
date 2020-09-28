@@ -36,7 +36,7 @@ public class App {
 
   private static App instance = null;
 
-  private Context m_ctx;
+  private final Context m_ctx;
 
   private String m_appName;
 
