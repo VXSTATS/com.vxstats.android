@@ -2,3 +2,4 @@
 statistics/build
 local.properties
 .gradle
+.scannerwork
