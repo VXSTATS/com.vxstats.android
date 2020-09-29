@@ -193,7 +193,7 @@ public class Statistics {
    * @~
    * @~
    */
-  public synchronized static Statistics instance( Activity activity ) {
+  public static synchronized Statistics instance( Activity activity ) {
 
     if ( instance == null )
       instance = new Statistics( activity );
@@ -203,6 +203,7 @@ public class Statistics {
   public void destroy() {
 
     if ( instance != null ) {
+
       App.instance( m_activity ).destroy();
       Device.instance( m_activity ).destroy();
       instance = null;
@@ -235,6 +236,8 @@ public class Statistics {
       catch ( MalformedURLException e ) {
 
         e.printStackTrace();
+        m_serverFilePath = serverFilePath;
+        return;
       }
 
       String path = url.getPath();
@@ -729,7 +732,7 @@ public class Statistics {
 
         /* TODO: Insert digest auth: https://stackoverflow.com/a/40079688 */
         HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.STRICT_HOSTNAME_VERIFIER;
-        SSLContext sc = SSLContext.getInstance( "TLS" );
+        SSLContext sc = SSLContext.getInstance( "TLSv1.2" );
         sc.init( null, new TrustManager[]{ new SSLTrustManager() }, new SecureRandom() );
         HttpsURLConnection.setDefaultSSLSocketFactory( sc.getSocketFactory() );
 

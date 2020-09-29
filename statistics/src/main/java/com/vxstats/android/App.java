@@ -127,14 +127,14 @@ public class App {
    * @~
    * @~
    */
-  public synchronized static App instance( Activity activity ) {
+  public static synchronized App instance( Activity activity ) {
 
     if ( instance == null )
       instance = new App( activity );
     return instance;
   }
 
-  public void destroy() {
+  public static void destroy() {
 
     if ( instance != null )
       instance = null;

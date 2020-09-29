@@ -67,7 +67,8 @@ public class Device {
 
   private void setUniqueIdentifier() {
 
-    final String tmDevice, tmSerial;
+    String tmDevice = "";
+    String tmSerial = "";
     final TelephonyManager tm = ( TelephonyManager )m_ctx.getSystemService( Context.TELEPHONY_SERVICE );
     if ( tm != null ) {
 
@@ -124,14 +125,14 @@ public class Device {
    * @~
    * @~
    */
-  public synchronized static Device instance( Activity activity ) {
+  public static synchronized Device instance( Activity activity ) {
 
     if ( instance == null )
       instance = new Device( activity );
     return instance;
   }
 
-  public void destroy() {
+  public static void destroy() {
 
     if ( instance != null )
       instance = null;

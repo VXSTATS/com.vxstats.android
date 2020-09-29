@@ -27,8 +27,8 @@ public class Reachability {
 
   private NetworkInfo network;
 
-  public String availableNetwork;
-  public String availableRadio;
+  public static String availableNetwork;
+  public static String availableRadio;
 
   public Reachability( Activity activity ) {
 
