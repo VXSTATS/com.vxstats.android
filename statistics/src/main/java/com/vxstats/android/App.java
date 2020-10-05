@@ -36,19 +36,19 @@ public class App {
 
   private static App instance = null;
 
-  private final Context m_ctx;
+  private final Context context;
 
-  private String m_appName;
+  private String appName;
 
-  private String m_appVersion;
+  private String appVersion;
 
-  private int m_appBuild;
+  private int appBuild;
 
-  private String m_appIdentifier = "";
+  private String appIdentifier = "";
 
   private App( Activity activity ) {
 
-    m_ctx = activity.getApplicationContext();
+    context = activity.getApplicationContext();
 
     setAppName();
     setAppIdent();
@@ -59,19 +59,19 @@ public class App {
   private void setAppName() {
 
     String mAppName;
-    mAppName = ( String ) m_ctx.getPackageManager().getApplicationLabel( m_ctx.getApplicationInfo() );
+    mAppName = ( String ) context.getPackageManager().getApplicationLabel( context.getApplicationInfo() );
 
-    this.m_appVersion = mAppName;
+    this.appVersion = mAppName;
   }
 
   private void setAppIdent() {
 
-    if ( m_appIdentifier.equals( "" ) ) {
+    if ( appIdentifier.equals( "" ) ) {
 
       try {
 
-        String pkg = m_ctx.getPackageName();
-        m_appIdentifier = m_ctx.getPackageManager().getPackageInfo( pkg, 0 ).packageName;
+        String pkg = context.getPackageName();
+        appIdentifier = context.getPackageManager().getPackageInfo( pkg, 0 ).packageName;
       }
       catch ( NameNotFoundException e ) {
 
@@ -85,8 +85,8 @@ public class App {
 
     try {
 
-      String pkg = m_ctx.getPackageName();
-      m_appVersion = m_ctx.getPackageManager().getPackageInfo( pkg, 0 ).versionName;
+      String pkg = context.getPackageName();
+      appVersion = context.getPackageManager().getPackageInfo( pkg, 0 ).versionName;
     }
     catch ( NameNotFoundException e ) {
 
@@ -99,8 +99,8 @@ public class App {
 
     try {
 
-      String pkg = m_ctx.getPackageName();
-      m_appBuild = m_ctx.getPackageManager().getPackageInfo( pkg, 0 ).versionCode;
+      String pkg = context.getPackageName();
+      appBuild = context.getPackageManager().getPackageInfo( pkg, 0 ).versionCode;
     }
     catch ( NameNotFoundException e ) {
 
@@ -115,8 +115,10 @@ public class App {
    */
   public void setAppIdentifier( String name ) {
 
-    if ( name.length() > 0 )
-      m_appIdentifier = name;
+    if ( name.length() > 0 ) {
+
+      appIdentifier = name;
+    }
   }
 
   /**
@@ -129,15 +131,19 @@ public class App {
    */
   public static synchronized App instance( Activity activity ) {
 
-    if ( instance == null )
+    if ( instance == null ) {
+
       instance = new App( activity );
+    }
     return instance;
   }
 
   public static void destroy() {
 
-    if ( instance != null )
+    if ( instance != null ) {
+
       instance = null;
+    }
   }
 
   /**
@@ -148,7 +154,7 @@ public class App {
    */
   public String getAppName() {
 
-    return this.m_appName;
+    return this.appName;
   }
 
   /**
@@ -159,12 +165,12 @@ public class App {
    */
   public String getAppVersion() {
 
-    return this.m_appVersion;
+    return this.appVersion;
   }
 
   public int getAppBuild() {
 
-    return this.m_appBuild;
+    return this.appBuild;
   }
 
   /**
@@ -175,6 +181,6 @@ public class App {
    */
   public String getAppIdentifier() {
 
-    return this.m_appIdentifier;
+    return this.appIdentifier;
   }
 }

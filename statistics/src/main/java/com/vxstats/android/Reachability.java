@@ -27,8 +27,8 @@ public class Reachability {
 
   private NetworkInfo network;
 
-  public static String availableNetwork;
-  public static String availableRadio;
+  public String availableNetwork;
+  public String availableRadio;
 
   public Reachability( Activity activity ) {
 
@@ -62,6 +62,8 @@ public class Reachability {
           break;
         case ConnectivityManager.TYPE_BLUETOOTH:
           availableNetwork = "Bluetooth";
+          break;
+        default:
           break;
       }
     }
@@ -123,6 +125,8 @@ public class Reachability {
           break;
         case TelephonyManager.NETWORK_TYPE_UMTS:
           availableRadio = "3G";
+          break;
+        default:
           break;
       }
     }

@@ -39,23 +39,23 @@ public class Device {
 
   private static Device instance = null;
 
-  private final Context m_ctx;
+  private final Context context;
 
-  private String m_manufacturer;
+  private String manufacturer;
 
-  private String m_model;
+  private String model;
 
-  private String m_modelVersion;
+  private String modelVersion;
 
-  private String m_name;
+  private String name;
 
-  private String m_version;
+  private String version;
 
-  private String m_uniqueIdentifier;
+  private String uniqueIdentifier;
 
   private Device( Activity activity ) {
 
-    m_ctx = activity.getApplicationContext();
+    context = activity.getApplicationContext();
 
     setUniqueIdentifier();
     setManufacturer();
@@ -69,7 +69,7 @@ public class Device {
 
     String tmDevice = "";
     String tmSerial = "";
-    final TelephonyManager tm = ( TelephonyManager )m_ctx.getSystemService( Context.TELEPHONY_SERVICE );
+    final TelephonyManager tm = ( TelephonyManager ) context.getSystemService( Context.TELEPHONY_SERVICE );
     if ( tm != null ) {
 
       tmDevice = tm.getDeviceId();
@@ -77,44 +77,52 @@ public class Device {
     }
 
     final String androidId;
-    androidId = android.provider.Settings.Secure.getString( m_ctx.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID );
+    androidId = android.provider.Settings.Secure.getString( context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID );
 
     UUID deviceUuid = new UUID( androidId.hashCode(), ( ( long )tmDevice.hashCode() << 32 ) | tmSerial.hashCode() );
-    this.m_uniqueIdentifier = deviceUuid.toString();
+    this.uniqueIdentifier = deviceUuid.toString();
   }
 
   private void setManufacturer() {
 
-    String manufacturer = Build.MANUFACTURER;
-    if ( manufacturer.equals( "unknown" ) )
-      manufacturer = "Android Simulator";
-    this.m_manufacturer = manufacturer;
+    String buildManufacturer = Build.MANUFACTURER;
+    if ( buildManufacturer.equals( "unknown" ) ) {
+
+      buildManufacturer = "Android Simulator";
+    }
+    this.manufacturer = buildManufacturer;
   }
 
   private void setModel() {
 
-    String model = Build.MODEL;
-    if ( model.contains( this.m_manufacturer + " " ) )
-      model = model.replace( this.m_manufacturer + " ", "" );
-    this.m_model = model;
+    String buildModel = Build.MODEL;
+    if ( buildModel.contains( this.manufacturer ) ) {
+
+      buildModel = buildModel.replace( this.manufacturer, "" );
+      buildModel = buildModel.trim();
+    }
+    this.model = buildModel;
   }
 
   private void setModelVersion() {
 
-    String version = Build.MODEL;
-    if ( version.contains( this.m_model + " " ) )
-      version = version.replace( this.m_model + " ", "" );
-    this.m_modelVersion = version;
+    String buildModel = Build.MODEL;
+    if ( buildModel.contains( this.model ) ) {
+
+      buildModel = buildModel.replace( this.model, "" );
+      buildModel = buildModel.trim();
+    }
+    this.modelVersion = buildModel;
   }
 
   private void setName() {
 
-    this.m_name = "Android";
+    this.name = "Android";
   }
 
   private void setVersion() {
 
-    this.m_version = android.os.Build.VERSION.RELEASE;
+    this.version = android.os.Build.VERSION.RELEASE;
   }
 
   /**
@@ -127,15 +135,19 @@ public class Device {
    */
   public static synchronized Device instance( Activity activity ) {
 
-    if ( instance == null )
+    if ( instance == null ) {
+
       instance = new Device( activity );
+    }
     return instance;
   }
 
   public static void destroy() {
 
-    if ( instance != null )
+    if ( instance != null ) {
+
       instance = null;
+    }
   }
 
   /**
@@ -146,7 +158,7 @@ public class Device {
    */
   public String getUniqueIdentifier() {
 
-    return this.m_uniqueIdentifier;
+    return this.uniqueIdentifier;
   }
 
   /**
@@ -157,7 +169,7 @@ public class Device {
    */
   public String getManufacturer() {
 
-    return this.m_manufacturer;
+    return this.manufacturer;
   }
 
   /**
@@ -168,7 +180,7 @@ public class Device {
    */
   public String getModel() {
 
-    return this.m_model;
+    return this.model;
   }
 
   /**
@@ -179,7 +191,7 @@ public class Device {
    */
   public String getModelVersion() {
 
-    return this.m_modelVersion;
+    return this.modelVersion;
   }
 
   /**
@@ -190,7 +202,7 @@ public class Device {
    */
   public String getName() {
 
-    return this.m_name;
+    return this.name;
   }
 
   /**
@@ -201,6 +213,6 @@ public class Device {
    */
   public String getVersion() {
 
-    return this.m_version;
+    return this.version;
   }
 }

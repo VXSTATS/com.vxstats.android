@@ -43,6 +43,7 @@ import javax.security.cert.X509Certificate;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -126,53 +127,53 @@ public class Statistics {
 
   private static Statistics instance = null;
 
-  private Activity m_activity;
+  private Activity activity;
 
-  private final Context m_ctx;
+  private final Context context;
 
   /**
    * @~english Checking connection in order to determine the connection speed or to transfer pending data.
    * @~german Überprüfen der Verbindung um die Verbindungsgeschwindigkeit zu ermitteln oder ausstehende Daten zu übermitteln.
    */
-  private final Reachability m_reach;
+  private final Reachability reachability;
 
   /**
    * @~english Path to statistics server.
    * @~german Der Pfad zum Statistikserver.
    */
-  private String m_serverFilePath;
+  private String serverFilePath;
 
   /**
    * @~english The last used page is buffered in order to use the actions and search comfortably.
    * @~german Die zuletzt verwendete Seite wird zwischengespeichert um die Aktionen und Suchen komfortabel zu verwenden.
    */
-  private String m_lastPageName;
+  private String lastPageName;
 
-  private String m_user = "";
+  private String username = "";
 
-  private String m_pw = "";
+  private String password = "";
 
-  private String m_event = "";
+  private String event = "";
 
-  private String m_value = "";
+  private String value = "";
 
   /**
    * @~english The current network state.
    * @~german Der aktuelle Netzwerkstatus.
    */
-  private String m_status = "Offline";
+  private String status = "Offline";
 
-  private final List<String> m_messageQueue = new ArrayList<>();
+  private final List<String> messageQueue = new ArrayList<>();
 
-  private InitTask m_initTask;
+  private InitTask initTask;
 
   private Statistics( Activity activity ) {
 
-    m_ctx = activity.getApplicationContext();
+    context = activity.getApplicationContext();
 
     App.instance( activity );
     Device.instance( activity );
-    m_reach = new Reachability( activity );
+    reachability = new Reachability( activity );
   }
 
   /**
@@ -195,8 +196,10 @@ public class Statistics {
    */
   public static synchronized Statistics instance( Activity activity ) {
 
-    if ( instance == null )
+    if ( instance == null ) {
+
       instance = new Statistics( activity );
+    }
     return instance;
   }
 
@@ -204,8 +207,8 @@ public class Statistics {
 
     if ( instance != null ) {
 
-      App.instance( m_activity ).destroy();
-      Device.instance( m_activity ).destroy();
+      App.instance( activity ).destroy();
+      Device.instance( activity ).destroy();
       instance = null;
     }
   }
@@ -236,7 +239,7 @@ public class Statistics {
       catch ( MalformedURLException e ) {
 
         e.printStackTrace();
-        m_serverFilePath = serverFilePath;
+        this.serverFilePath = serverFilePath;
         return;
       }
 
@@ -246,21 +249,21 @@ public class Statistics {
       String auth = url.getUserInfo();
 
       login = auth.split( ":" );
-      m_user = login[ 0 ];
-      m_pw = login[ 1 ];
+      username = login[ 0 ];
+      password = login[ 1 ];
       serverFilePath = proto + "://" + host + path;
     }
-    m_serverFilePath = serverFilePath;
+    this.serverFilePath = serverFilePath;
   }
 
   public void setUsername( String username ) {
 
-    m_user = username;
+    this.username = username;
   }
 
   public void setPassword( String password ) {
 
-    m_pw = password;
+    this.password = password;
   }
 
   /**
@@ -287,7 +290,7 @@ public class Statistics {
     pageName = pageName.replace( "'", "%2F" );
     pageName = pageName.replace( "|", "%7C" );
 
-    m_lastPageName = pageName;
+    lastPageName = pageName;
 
     event( "", "" );
   }
@@ -364,19 +367,21 @@ public class Statistics {
    */
   public void event( String eventName, String value ) {
 
-    if ( m_lastPageName.equals( "" ) )
+    if ( lastPageName.equals( "" ) ) {
+
       Log.i( "STATISTICS", "Bad implementation - 'event': " + eventName + " with empty 'pageName'" );
+    }
 
     if ( ! eventName.equals( "" ) ) {
 
       eventName = eventName.replace( "&", "%26" );
       eventName = eventName.replace( "'", "%2F" );
       eventName = eventName.replace( "|", "%7C" );
-      m_event = eventName;
+      event = eventName;
     }
     else {
 
-      m_event = "";
+      event = "";
     }
 
     if ( ! value.equals( "" ) ) {
@@ -384,20 +389,22 @@ public class Statistics {
       value = value.replace( "&", "%26" );
       value = value.replace( "'", "%2F" );
       value = value.replace( "|", "%7C" );
-      m_value = value;
+      this.value = value;
     }
     else {
 
-      m_value = "";
+      this.value = "";
     }
 
     String core = coreMessage();
     //addOutstandingMessage(core);
-    m_initTask = new InitTask();
-    m_initTask.execute( core );
+    initTask = new InitTask();
+    initTask.execute( core );
 
-    if ( !m_status.equals( m_reach.getConnectionType() ) )
+    if ( ! status.equals( reachability.getConnectionType() ) ) {
+
       reachabilityChanged();
+    }
   }
 
   /**
@@ -412,8 +419,10 @@ public class Statistics {
    */
   public void ads( String campaign ) {
 
-    if ( campaign.equals( "" ) )
+    if ( campaign.equals( "" ) ) {
+
       Log.i( "STATISTICS", "Bad implementation - 'ads' with empty 'campaign' name" );
+    }
     if ( campaign.length() > 255 ) {
 
       Log.i( "STATISTICS", "Bad implementation - 'campaign': " + campaign + " is larger than 255 signs" );
@@ -436,8 +445,10 @@ public class Statistics {
    */
   public void move( float latitude, float longitude ) {
 
-    if ( latitude == 0.0 || longitude == 0.0 )
+    if ( latitude == 0.0 || longitude == 0.0 ) {
+
       Log.i( "STATISTICS", "Bad implementation - 'move' with empty 'latitude' or 'longitude'" );
+    }
     event( "move", latitude + "," + longitude );
   }
 
@@ -454,8 +465,10 @@ public class Statistics {
    */
   public void open( String urlOrName ) {
 
-    if ( urlOrName.equals( "" ) )
+    if ( urlOrName.equals( "" ) ) {
+
       Log.i( "STATISTICS", "Bad implementation - 'open' with empty 'urlOrName'" );
+    }
     if ( urlOrName.length() > 255 ) {
 
       Log.i( "STATISTICS", "Bad implementation - 'urlOrName': " + urlOrName + " is larger than 255 signs" );
@@ -476,8 +489,10 @@ public class Statistics {
    */
   public void play( String urlOrName ) {
 
-    if ( urlOrName.equals( "" ) )
+    if ( urlOrName.equals( "" ) ) {
+
       Log.i( "STATISTICS", "Bad implementation - 'play' with empty 'urlOrName'" );
+    }
     if ( urlOrName.length() > 255 ) {
 
       Log.i( "STATISTICS", "Bad implementation - 'urlOrName': " + urlOrName + " is larger than 255 signs" );
@@ -498,8 +513,10 @@ public class Statistics {
    */
   public void search( String text ) {
 
-    if ( text.equals( "" ) )
+    if ( text.equals( "" ) ) {
+
       Log.i( "STATISTICS", "Bad implementation - 'search' with empty 'text'" );
+    }
     if ( text.length() > 255 ) {
 
       Log.i( "STATISTICS", "Bad implementation - 'text': " + text + " is larger than 255 signs" );
@@ -533,8 +550,10 @@ public class Statistics {
    */
   public void touch( String action ) {
 
-    if ( action.equals( "" ) )
+    if ( action.equals( "" ) ) {
+
       Log.i( "STATISTICS", "Bad implementation - 'touch' with empty 'action'" );
+    }
     if ( action.length() > 255 ) {
 
       Log.i( "STATISTICS", "Bad implementation - 'action': " + action + " is larger than 255 signs" );
@@ -548,12 +567,12 @@ public class Statistics {
     String core;
 
     /* device */
-    core = "uuid=" + Device.instance( m_activity ).getUniqueIdentifier() + "&";
-    core += "os=" + Device.instance( m_activity ).getName() + "&";
-    core += "osversion=" + Device.instance( m_activity ).getVersion() + "&";
-    core += "vendor=" + Device.instance( m_activity ).getManufacturer() + "&";
-    core += "model=" + Device.instance( m_activity ).getModel() + "&";
-    core += "modelversion=" + Device.instance( m_activity ).getModelVersion() + "&";
+    core = "uuid=" + Device.instance( activity ).getUniqueIdentifier() + "&";
+    core += "os=" + Device.instance( activity ).getName() + "&";
+    core += "osversion=" + Device.instance( activity ).getVersion() + "&";
+    core += "vendor=" + Device.instance( activity ).getManufacturer() + "&";
+    core += "model=" + Device.instance( activity ).getModel() + "&";
+    core += "modelversion=" + Device.instance( activity ).getModelVersion() + "&";
 
     /* locale */
     String locale = Locale.getDefault().toString();
@@ -565,13 +584,19 @@ public class Statistics {
     core += "country=" + country + "&";
 
     /* connection */
-    core += "connection=" + m_reach.getConnectionType() + "&";
-    core += "radio=" + m_reach.getRadioType() + "&";
+    core += "connection=" + reachability.getConnectionType() + "&";
+    core += "radio=" + reachability.getRadioType() + "&";
 
     /* app block */
-    core += "appid=" + App.instance( m_activity ).getAppIdentifier() + "&";
-    core += "appversion=" + App.instance( m_activity ).getAppVersion() + "&";
-    core += "appbuild=" + App.instance( m_activity ).getAppBuild() + "&";
+    core += "appid=" + App.instance( activity ).getAppIdentifier() + "&";
+    core += "appversion=" + App.instance( activity ).getAppVersion() + "&";
+    core += "appbuild=" + App.instance( activity ).getAppBuild() + "&";
+
+    int nightModeFlag = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+    if ( nightModeFlag == Configuration.UI_MODE_NIGHT_YES ) {
+
+      core += "dark=1&";
+    }
 
     /* is this app fairly used */
 //    core += "TODO: fair=" + "1" + "&";
@@ -579,19 +604,19 @@ public class Statistics {
     //is the device jailbroken?
 //    core += "TODO: free=" + "0" + "&";
 
-    /* TODO: tabletmode */
-    if ( m_ctx.getPackageManager().hasSystemFeature( "android.hardware.touchscreen" ) ) {
+    core += "tabletmode=1&";
+    if ( context.getPackageManager().hasSystemFeature( "android.hardware.touchscreen" ) ) {
 
       core += "touch=1&";
     }
 
-    AccessibilityManager am = ( AccessibilityManager )m_ctx.getSystemService( Context.ACCESSIBILITY_SERVICE );
+    AccessibilityManager am = ( AccessibilityManager ) context.getSystemService( Context.ACCESSIBILITY_SERVICE );
     if ( am != null && am.isTouchExplorationEnabled() ) {
 
       core += "voiceover=1&";
     }
 
-    WindowManager wm = ( WindowManager )m_ctx.getSystemService( Context.WINDOW_SERVICE );
+    WindowManager wm = ( WindowManager ) context.getSystemService( Context.WINDOW_SERVICE );
     if ( wm != null ) {
 
       Display display = wm.getDefaultDisplay();
@@ -611,73 +636,80 @@ public class Statistics {
     core += "created=" + System.currentTimeMillis() / 1000L + "&";
 
     /* data block */
-    core += "page=" + m_lastPageName;
-    if ( !m_event.equals( "" ) ) {
+    core += "page=" + lastPageName;
+    if ( ! event.equals( "" ) ) {
 
-      core += "&action=" + m_event;
+      core += "&action=" + event;
     }
-    if ( !m_value.equals( "" ) ) {
+    if ( ! value.equals( "" ) ) {
 
-      core += "&value=" + m_value;
+      core += "&value=" + value;
     }
     return core;
   }
 
   private void reachabilityChanged() {
 
-    m_status = m_reach.getConnectionType();
-    if ( !m_status.equals( "Offline" ) )
+    status = reachability.getConnectionType();
+    if ( ! status.equals( "Offline" ) ) {
+
       sendOutstandingMessage();
+    }
   }
 
   private void addOutstandingMessage( String message ) {
 
-    m_messageQueue.add( message );
+    messageQueue.add( message );
   }
 
   private void writeOutstandingMessages() {
 
-    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences( m_ctx );
-    String mes = preferences.getString( "offline", "" );
+    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences( context );
+    String messages = preferences.getString( "offline", "" );
 
-    String[] splitArray = mes.split( "\\|" );
-    List<String> temp_messageQueue = new ArrayList<>();
-    if ( ! splitArray[ 0 ].equals( "" ) )
-      temp_messageQueue.addAll( Arrays.asList( splitArray ) );
+    String[] splitArray = messages.split( "\\|" );
+    List<String> tempMessageQueue = new ArrayList<>();
+    if ( ! splitArray[ 0 ].equals( "" ) ) {
 
-    if ( m_messageQueue.size() > 0 ) {
-
-      temp_messageQueue.addAll( m_messageQueue );
-      m_messageQueue.clear();
+      tempMessageQueue.addAll( Arrays.asList( splitArray ) );
     }
 
-    for ( int i = 0; i < temp_messageQueue.size(); i++ ) {
+    if ( !messageQueue.isEmpty() ) {
 
-      if ( i == 0 )
-        mes = temp_messageQueue.get( i );
-      else
-        mes = mes + "|" + temp_messageQueue.get( i );
+      tempMessageQueue.addAll( messageQueue );
+      messageQueue.clear();
     }
+
+    StringBuilder stringBuilder = new StringBuilder();
+    for ( int i = 0; i < tempMessageQueue.size(); i++ ) {
+
+      if ( i > 0 ) {
+
+        stringBuilder.append( "|" );
+      }
+      stringBuilder.append( tempMessageQueue.get( i ) );
+    }
+    messages = stringBuilder.toString();
 
     SharedPreferences.Editor editor = preferences.edit();
-    editor.putString( "offline", mes );
+    editor.putString( "offline", messages );
 
     editor.commit();
   }
 
   private void sendOutstandingMessage() {
 
-    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences( m_ctx );
-    String mes = preferences.getString( "offline", "" );
+    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences( context );
+    String messages = preferences.getString( "offline", "" );
 
     SharedPreferences.Editor editor = preferences.edit();
     editor.putString( "offline", "" );
     editor.commit();
 
-    if ( mes.length() != 0 ) {
+    if ( messages.length() != 0 ) {
 
-      m_initTask = new InitTask();
-      m_initTask.execute( mes );
+      initTask = new InitTask();
+      initTask.execute( messages );
     }
   }
 
@@ -719,9 +751,9 @@ public class Statistics {
   private InputStream UrlConnection( String url, String data ) throws KeyManagementException, MalformedURLException, IOException {
 
     String serverAuthBase64 = null;
-    if ( ! m_user.equals( "" ) || ! m_pw.equals( "" ) ) {
+    if ( ! username.equals( "" ) || ! password.equals( "" ) ) {
 
-      String serverAuth = m_user + ":" + m_pw;
+      String serverAuth = username + ":" + password;
       serverAuthBase64 = Base64.encodeToString( serverAuth.getBytes( StandardCharsets.UTF_8 ), Base64.DEFAULT );
     }
 
@@ -738,43 +770,42 @@ public class Statistics {
 
         HttpsURLConnection.setDefaultHostnameVerifier( hostnameVerifier );
 
-        HttpsURLConnection con = ( HttpsURLConnection ) new URL( url ).openConnection();
+        HttpsURLConnection connection = ( HttpsURLConnection ) new URL( url ).openConnection();
+        connection.setRequestMethod( "POST" );
+        if ( ! username.equals( "" ) || ! password.equals( "" ) ) {
 
-        con.setRequestMethod( "POST" );
-        if ( !m_user.equals( "" ) || !m_pw.equals( "" ) )
-          con.setRequestProperty( "Authorization", "Basic " + serverAuthBase64 );
-        con.setDoOutput( true );
+          connection.setRequestProperty( "Authorization", "Basic " + serverAuthBase64 );
+        }
+        connection.setDoOutput( true );
 
-        OutputStreamWriter wr = new OutputStreamWriter( con.getOutputStream() );
-        wr.write( data );
-        wr.flush();
+        OutputStreamWriter streamWriter = new OutputStreamWriter( connection.getOutputStream() );
+        streamWriter.write( data );
+        streamWriter.flush();
 
-        stream = con.getInputStream();
+        stream = connection.getInputStream();
 
-        wr.close();
+        streamWriter.close();
       }
-      catch ( NoSuchAlgorithmException e ) {
+      catch ( NoSuchAlgorithmException exception ) {
 
-        e.printStackTrace();
+        exception.printStackTrace();
       }
     }
     else {
 
-      HttpURLConnection con = ( HttpURLConnection ) new URL( url ).openConnection();
+      HttpURLConnection connection = ( HttpURLConnection ) new URL( url ).openConnection();
+      connection.setRequestMethod( "POST" );
+      if ( ! username.equals( "" ) || ! password.equals( "" ) )
+        connection.setRequestProperty( "Authorization", "Basic " + serverAuthBase64 );
+      connection.setDoOutput( true );
 
-      con.setRequestMethod( "POST" );
-      if ( !m_user.equals( "" ) || !m_pw.equals( "" ) )
-        con.setRequestProperty( "Authorization", "Basic " + serverAuthBase64 );
-      con.setDoOutput( true );
+      OutputStreamWriter streamWriter = new OutputStreamWriter( connection.getOutputStream() );
+      streamWriter.write( data );
+      streamWriter.flush();
 
-      OutputStreamWriter wr = new OutputStreamWriter( con.getOutputStream() );
-      wr.write( data );
-      wr.flush();
+      stream = connection.getInputStream();
 
-
-      stream = con.getInputStream();
-
-      wr.close();
+      streamWriter.close();
     }
     return stream;
   }
@@ -789,14 +820,17 @@ public class Statistics {
 
         String[] splitArray = message.split( "\\|" );
         if ( splitArray.length == 1 ) {
+
           sendMessage( splitArray[ 0 ] );
         }
         else {
 
-          List<String> temp_messageQueue = new ArrayList<>( Arrays.asList( splitArray ) );
+          List<String> tempMessageQueue = new ArrayList<>( Arrays.asList( splitArray ) );
 
-          for ( int i = 0; i < temp_messageQueue.size(); i++ )
-            sendMessage( temp_messageQueue.get( i ) );
+          for ( int i = 0; i < tempMessageQueue.size(); i++ ) {
+
+            sendMessage( tempMessageQueue.get( i ) );
+          }
         }
         writeOutstandingMessages();
       }
@@ -829,27 +863,29 @@ public class Statistics {
 
     private void sendMessage( String message ) {
 
-      if ( !m_reach.getConnectionType().equals( "Offline" ) ) {
+      if ( ! reachability.getConnectionType().equals( "Offline" ) ) {
 
         try {
 
-          String url = m_serverFilePath;
+          String url = serverFilePath;
           UrlConnection( url, message );
 
         }
-        catch ( IOException e ) {
+        catch ( IOException exception ) {
 
           addOutstandingMessage( message );
-          e.printStackTrace();
+          exception.printStackTrace();
         }
-        catch ( KeyManagementException e ) {
+        catch ( KeyManagementException exception ) {
 
           addOutstandingMessage( message );
-          e.printStackTrace();
+          exception.printStackTrace();
         }
       }
-      else
+      else {
+
         addOutstandingMessage( message );
+      }
     }
   }
 }
