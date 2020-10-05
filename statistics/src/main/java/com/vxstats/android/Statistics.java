@@ -230,7 +230,7 @@ public class Statistics {
     if ( serverFilePath.contains( "@" ) ) {
 
       String[] login;
-      URL url = null;
+      URL url;
 
       try {
 
@@ -667,11 +667,14 @@ public class Statistics {
     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences( context );
     String messages = preferences.getString( "offline", "" );
 
-    String[] splitArray = messages.split( "\\|" );
     List<String> tempMessageQueue = new ArrayList<>();
-    if ( ! splitArray[ 0 ].equals( "" ) ) {
+    if ( messages != null ) {
 
-      tempMessageQueue.addAll( Arrays.asList( splitArray ) );
+      String[] splitArray = messages.split( "\\|" );
+      if ( ! splitArray[ 0 ].equals( "" ) ) {
+
+        tempMessageQueue.addAll( Arrays.asList( splitArray ) );
+      }
     }
 
     if ( !messageQueue.isEmpty() ) {
@@ -693,8 +696,7 @@ public class Statistics {
 
     SharedPreferences.Editor editor = preferences.edit();
     editor.putString( "offline", messages );
-
-    editor.commit();
+    editor.apply();
   }
 
   private void sendOutstandingMessage() {
@@ -704,9 +706,9 @@ public class Statistics {
 
     SharedPreferences.Editor editor = preferences.edit();
     editor.putString( "offline", "" );
-    editor.commit();
+    editor.apply();
 
-    if ( messages.length() != 0 ) {
+    if ( messages != null && messages.length() != 0 ) {
 
       initTask = new InitTask();
       initTask.execute( messages );
@@ -748,7 +750,7 @@ public class Statistics {
     }
   }
 
-  private InputStream UrlConnection( String url, String data ) throws KeyManagementException, MalformedURLException, IOException {
+  private InputStream UrlConnection( String url, String data ) throws KeyManagementException, IOException {
 
     String serverAuthBase64 = null;
     if ( ! username.equals( "" ) || ! password.equals( "" ) ) {
@@ -767,11 +769,11 @@ public class Statistics {
         SSLContext sc = SSLContext.getInstance( "TLSv1.2" );
         sc.init( null, new TrustManager[]{ new SSLTrustManager() }, new SecureRandom() );
         HttpsURLConnection.setDefaultSSLSocketFactory( sc.getSocketFactory() );
-
         HttpsURLConnection.setDefaultHostnameVerifier( hostnameVerifier );
 
         HttpsURLConnection connection = ( HttpsURLConnection ) new URL( url ).openConnection();
         connection.setRequestMethod( "POST" );
+        connection.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded" );
         if ( ! username.equals( "" ) || ! password.equals( "" ) ) {
 
           connection.setRequestProperty( "Authorization", "Basic " + serverAuthBase64 );
@@ -795,8 +797,11 @@ public class Statistics {
 
       HttpURLConnection connection = ( HttpURLConnection ) new URL( url ).openConnection();
       connection.setRequestMethod( "POST" );
-      if ( ! username.equals( "" ) || ! password.equals( "" ) )
+      connection.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded" );
+      if ( ! username.equals( "" ) || ! password.equals( "" ) ) {
+
         connection.setRequestProperty( "Authorization", "Basic " + serverAuthBase64 );
+      }
       connection.setDoOutput( true );
 
       OutputStreamWriter streamWriter = new OutputStreamWriter( connection.getOutputStream() );
@@ -871,12 +876,7 @@ public class Statistics {
           UrlConnection( url, message );
 
         }
-        catch ( IOException exception ) {
-
-          addOutstandingMessage( message );
-          exception.printStackTrace();
-        }
-        catch ( KeyManagementException exception ) {
+        catch ( IOException | KeyManagementException exception ) {
 
           addOutstandingMessage( message );
           exception.printStackTrace();

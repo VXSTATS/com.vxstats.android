@@ -73,9 +73,9 @@ public class App {
         String pkg = context.getPackageName();
         appIdentifier = context.getPackageManager().getPackageInfo( pkg, 0 ).packageName;
       }
-      catch ( NameNotFoundException e ) {
+      catch ( NameNotFoundException exception ) {
 
-        e.printStackTrace();
+        exception.printStackTrace();
         Log.e( "Error", "Bad implementation of packageName. Check your AndroidManifest!" );
       }
     }
@@ -88,9 +88,9 @@ public class App {
       String pkg = context.getPackageName();
       appVersion = context.getPackageManager().getPackageInfo( pkg, 0 ).versionName;
     }
-    catch ( NameNotFoundException e ) {
+    catch ( NameNotFoundException exception ) {
 
-      e.printStackTrace();
+      exception.printStackTrace();
       Log.e( "Error", "Bad implementation of versionName. Check your AndroidManifest!" );
     }
   }
@@ -102,9 +102,9 @@ public class App {
       String pkg = context.getPackageName();
       appBuild = context.getPackageManager().getPackageInfo( pkg, 0 ).versionCode;
     }
-    catch ( NameNotFoundException e ) {
+    catch ( NameNotFoundException exception ) {
 
-      e.printStackTrace();
+      exception.printStackTrace();
       Log.e( "Error", "Bad implementation of versionCode. Check your AndroidManifest!" );
     }
   }
