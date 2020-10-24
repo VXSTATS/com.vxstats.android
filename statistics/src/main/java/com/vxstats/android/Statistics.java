@@ -1,12 +1,12 @@
 /*
- * Copyright (C) 10/01/2020 VX APPS <sales@vxapps.com>
+ * Copyright (C) 10/01/2020 VX STATS <sales@vxstats.com>
  *
- * This document is property of VX APPS. It is strictly prohibited
+ * This document is property of VX STATS. It is strictly prohibited
  * to modify, sell or publish it in any way. In case you have access
  * to this document, you are obligated to ensure its nondisclosure.
  * Noncompliances will be prosecuted.
  *
- * Diese Datei ist Eigentum der VX APPS. Jegliche Änderung, Verkauf
+ * Diese Datei ist Eigentum der VX STATS. Jegliche Änderung, Verkauf
  * oder andere Verbreitung und Veröffentlichung ist strikt untersagt.
  * Falls Sie Zugang zu dieser Datei haben, sind Sie verpflichtet,
  * alles in Ihrer Macht stehende für deren Geheimhaltung zu tun.
@@ -55,7 +55,7 @@ import android.view.WindowManager;
 import android.view.accessibility.AccessibilityManager;
 
 /**
- * @author VX APPS <sales@vxapps.com>
+ * @author VX STATS <sales@vxstats.com>
  * @version 1.0
  * @~english
  * @b General:
@@ -108,7 +108,7 @@ import android.view.accessibility.AccessibilityManager;
  * @~english @b Example: @~german @b Beispiel:
  * @~english @n 1. Define a path to the statistics server. @~german @n 1. Angeben eines Pfads zum Statistikserver.
  * @~
- * @code Statistics.instance(this).setServerFilePath("https://sandbox.vxapps.com");
+ * @code Statistics.instance(this).setServerFilePath("https://sandbox.vxstats.com");
  * @endcode
  * @~english 2. Transfer page impression. @~german 2. Seitenimpression übermitteln.
  * @~
@@ -218,10 +218,10 @@ public class Statistics {
    * @~english Defines the path and name to the statistics server.
    * @~german Definiert den Pfad und Namen zum Statistikserver.
    * @~english @b Example: @~german @b Beispiel:
-   * @~english @n for the HTTPS address www.vxapps.com and the folder u/stats.php.
-   * @~german @n Für die HTTPS Adresse www.vxapps.com und dem Verzeichnis u/stats.php.
+   * @~english @n for the HTTPS address www.vxstats.com and the folder u/stats.php.
+   * @~german @n Für die HTTPS Adresse www.vxstats.com und dem Verzeichnis u/stats.php.
    * @~
-   * @code Statistics.instance(this).serverFilePath("https://www.vxapps.com/u/stats.php");
+   * @code Statistics.instance(this).serverFilePath("https://www.vxstats.com/u/stats.php");
    * @endcode
    * @~
    */
@@ -320,7 +320,7 @@ public class Statistics {
    * @~english @n Open browser with URL. @~german @n Browser mit URL.
    * @~
    * @code Statistics.instance(this).event("open", urlOrName);
-   * Statistics.instance(this).event("open", "https://www.vxapps.com");
+   * Statistics.instance(this).event("open", "https://www.vxstats.com");
    * @endcode
    * @code Statistics.instance(this).open(urlOrName);
    * @endcode
@@ -328,7 +328,7 @@ public class Statistics {
    * @~english @n Play video. @n @~german Video abspielen.
    * @~
    * @code Statistics.instance(this).event("play", urlOrName);
-   * Statistics.instance(this).event("play", "https://www.vxapps.com/movie.m4v");
+   * Statistics.instance(this).event("play", "https://www.vxstats.com/movie.m4v");
    * @endcode
    * @code Statistics.instance(this).play(urlOrName);
    * @endcode

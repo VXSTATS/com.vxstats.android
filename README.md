@@ -26,7 +26,7 @@ Setup your environment with your credentials. Please insert your username, passw
 ```java
 Statistics.instance(this).setUsername("sandbox");
 Statistics.instance(this).setPassword("sandbox");
-Statistics.instance(this).setServerFilePath("https://sandbox.vxapps.com/");
+Statistics.instance(this).setServerFilePath("https://sandbox.vxstats.com/");
 ```
 
 ## Page
