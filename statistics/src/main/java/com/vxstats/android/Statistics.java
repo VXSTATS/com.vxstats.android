@@ -33,6 +33,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -121,7 +124,7 @@ import android.view.accessibility.AccessibilityManager;
  * @~
  * @brief @~english Communication with the statistics server. @~german Kommunikation mit dem Statistikserver.
  * @~
- * @date 01/09/2011
+ * @date 10/01/2020
  */
 public class Statistics {
 
@@ -752,13 +755,6 @@ public class Statistics {
 
   private InputStream UrlConnection( String url, String data ) throws KeyManagementException, IOException {
 
-    String serverAuthBase64 = null;
-    if ( ! username.equals( "" ) || ! password.equals( "" ) ) {
-
-      String serverAuth = username + ":" + password;
-      serverAuthBase64 = Base64.encodeToString( serverAuth.getBytes( StandardCharsets.UTF_8 ), Base64.DEFAULT );
-    }
-
     InputStream stream = null;
     if ( url.contains( "https" ) ) {
 
@@ -772,12 +768,16 @@ public class Statistics {
         HttpsURLConnection.setDefaultHostnameVerifier( hostnameVerifier );
 
         HttpsURLConnection connection = ( HttpsURLConnection ) new URL( url ).openConnection();
+        Authenticator.setDefault(new Authenticator() {
+
+          @Override
+          protected PasswordAuthentication getPasswordAuthentication() {
+
+            return new PasswordAuthentication(username, password.toCharArray());
+          }
+        });
         connection.setRequestMethod( "POST" );
         connection.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded" );
-        if ( ! username.equals( "" ) || ! password.equals( "" ) ) {
-
-          connection.setRequestProperty( "Authorization", "Basic " + serverAuthBase64 );
-        }
         connection.setDoOutput( true );
 
         OutputStreamWriter streamWriter = new OutputStreamWriter( connection.getOutputStream() );
@@ -796,12 +796,16 @@ public class Statistics {
     else {
 
       HttpURLConnection connection = ( HttpURLConnection ) new URL( url ).openConnection();
+      Authenticator.setDefault(new Authenticator() {
+
+        @Override
+        protected PasswordAuthentication getPasswordAuthentication() {
+
+          return new PasswordAuthentication(username, password.toCharArray());
+        }
+      });
       connection.setRequestMethod( "POST" );
       connection.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded" );
-      if ( ! username.equals( "" ) || ! password.equals( "" ) ) {
-
-        connection.setRequestProperty( "Authorization", "Basic " + serverAuthBase64 );
-      }
       connection.setDoOutput( true );
 
       OutputStreamWriter streamWriter = new OutputStreamWriter( connection.getOutputStream() );

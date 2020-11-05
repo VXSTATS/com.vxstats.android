@@ -20,6 +20,7 @@ package com.vxstats.android;
 import java.util.UUID;
 
 /* android imports */
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
@@ -33,7 +34,7 @@ import android.telephony.TelephonyManager;
  * @~
  * @brief @~english Information of the device. @~german Informationen über das Gerät.
  * @~
- * @date 01/09/2011
+ * @date 10/01/2020
  */
 public class Device {
 
@@ -65,6 +66,7 @@ public class Device {
     setVersion();
   }
 
+  @SuppressLint( "HardwareIds" )
   private void setUniqueIdentifier() {
 
     String tmDevice = "";

@@ -30,7 +30,7 @@ import android.util.Log;
  * @~
  * @brief @~english Information about the application. @~german Informationen über die Anwendung.
  * @~
- * @date 01/09/2011
+ * @date 10/01/2020
  */
 public class App {
 

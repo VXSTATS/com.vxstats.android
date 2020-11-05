@@ -85,4 +85,5 @@ Statistics.instance(this).touch("$action");
 
 # Compatiblity
 ## Android
-- API 16 4.1.1 and above x
+- API 19 4.4 and above
+- API 14 4.0.1 buildable and theoretical possible
