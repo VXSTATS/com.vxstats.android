@@ -23,7 +23,6 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -50,7 +49,6 @@ import android.content.res.Configuration;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -239,9 +237,9 @@ public class Statistics {
 
         url = new URL( serverFilePath );
       }
-      catch ( MalformedURLException e ) {
+      catch ( MalformedURLException exception ) {
 
-        e.printStackTrace();
+        Log.e( "STATISTICS", "EXCEPTION", exception );
         this.serverFilePath = serverFilePath;
         return;
       }
@@ -760,7 +758,6 @@ public class Statistics {
 
       try {
 
-        /* TODO: Insert digest auth: https://stackoverflow.com/a/40079688 */
         HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.STRICT_HOSTNAME_VERIFIER;
         SSLContext sc = SSLContext.getInstance( "TLSv1.2" );
         sc.init( null, new TrustManager[]{ new SSLTrustManager() }, new SecureRandom() );
@@ -773,7 +770,7 @@ public class Statistics {
           @Override
           protected PasswordAuthentication getPasswordAuthentication() {
 
-            return new PasswordAuthentication(username, password.toCharArray());
+            return new PasswordAuthentication( username, password.toCharArray() );
           }
         });
         connection.setRequestMethod( "POST" );
@@ -790,7 +787,7 @@ public class Statistics {
       }
       catch ( NoSuchAlgorithmException exception ) {
 
-        exception.printStackTrace();
+        Log.e( "STATISTICS", "EXCEPTION", exception );
       }
     }
     else {
@@ -801,7 +798,7 @@ public class Statistics {
         @Override
         protected PasswordAuthentication getPasswordAuthentication() {
 
-          return new PasswordAuthentication(username, password.toCharArray());
+          return new PasswordAuthentication( username, password.toCharArray() );
         }
       });
       connection.setRequestMethod( "POST" );
@@ -883,7 +880,7 @@ public class Statistics {
         catch ( IOException | KeyManagementException exception ) {
 
           addOutstandingMessage( message );
-          exception.printStackTrace();
+          Log.e( "STATISTICS", "EXCEPTION", exception );
         }
       }
       else {

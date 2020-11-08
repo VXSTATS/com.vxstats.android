@@ -75,8 +75,7 @@ public class App {
       }
       catch ( NameNotFoundException exception ) {
 
-        exception.printStackTrace();
-        Log.e( "Error", "Bad implementation of packageName. Check your AndroidManifest!" );
+        Log.e( "STATISTICS", "Bad implementation of packageName. Check your AndroidManifest!", exception );
       }
     }
   }
@@ -90,8 +89,7 @@ public class App {
     }
     catch ( NameNotFoundException exception ) {
 
-      exception.printStackTrace();
-      Log.e( "Error", "Bad implementation of versionName. Check your AndroidManifest!" );
+      Log.e( "STATISTICS", "Bad implementation of versionName. Check your AndroidManifest!", exception );
     }
   }
 
@@ -104,8 +102,7 @@ public class App {
     }
     catch ( NameNotFoundException exception ) {
 
-      exception.printStackTrace();
-      Log.e( "Error", "Bad implementation of versionCode. Check your AndroidManifest!" );
+      Log.e( "STATISTICS", "Bad implementation of versionCode. Check your AndroidManifest!", exception );
     }
   }
 
